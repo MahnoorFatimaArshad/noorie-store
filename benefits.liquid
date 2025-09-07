@@ -1,0 +1,240 @@
+{% comment %}
+  sections/feature-icons.liquid
+  — Slick slider with bottom center arrows + counter (original style)
+{% endcomment %}
+
+<!-- Slick CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css" />
+
+<style>
+  .feature-icons-section {
+    position: relative;
+    background: var(--section-bg-color);
+    padding: 40px 0;
+    margin: 40px 40px;
+  }
+
+  .feature-icons-list {
+    gap: var(--item-gap);
+  }
+
+  .feature-icons-item {
+    display: flex !important;
+    align-items: flex-start;
+    text-align: left;
+    padding: 10px;
+  }
+
+  .feature-icons-item__icon {
+    margin-right: 12px;
+    flex-shrink: 0;
+  }
+
+  .feature-icons-item__icon img {
+    width: var(--icon-size);
+    height: var(--icon-size);
+    object-fit: contain;
+    transition: transform 0.3s ease;
+  }
+
+  .feature-icons-item:hover .feature-icons-item__icon img {
+    transform: scale(1.1);
+  }
+
+  .feature-icons-item__text h4 {
+    margin: 0;
+    font-size: var(--heading-font-size);
+    font-weight: var(--heading-font-weight);
+    color: var(--heading-color);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    line-height: 1.2;
+  }
+
+  .feature-icons-item__text p {
+    margin: 4px 0 0;
+    font-size: var(--desc-font-size);
+    color: var(--desc-color);
+    line-height: 1.4;
+  }
+
+  /* Custom arrows and counter styling */
+  .feature-icons-section .slider-buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 1.5rem;
+  }
+
+  .slider-button {
+    background: none;
+    border: none;
+    padding: 0.5rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .slider-button svg {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+    transform: rotate(-90deg);
+  }
+
+  .slider-button--prev svg {
+    transform: rotate(90deg);
+  }
+
+  .slider-counter {
+    margin: 0 1rem;
+    font-weight: 600;
+    font-size: 16px;
+    color: var(--heading-color);
+  }
+
+  /* Hide Slick's default arrows and dots */
+  .slick-arrow,
+  .slick-dots {
+    display: none !important;
+  }
+</style>
+
+<section
+  class="feature-icons-section"
+  style="
+    --section-bg-color: {{ section.settings.section_bg_color }};
+    --heading-color: {{ section.settings.heading_color }};
+    --desc-color: {{ section.settings.desc_color }};
+    --icon-size: {{ section.settings.icon_size }}px;
+    --heading-font-size: {{ section.settings.heading_font_size }}px;
+    --desc-font-size: {{ section.settings.desc_font_size }}px;
+    --item-gap: {{ section.settings.item_gap }}px;
+    --heading-font-weight: {{ section.settings.heading_font_weight }};
+  "
+>
+  <div class="page-width">
+    <div id="feature-carousel-{{ section.id }}" class="feature-icons-list">
+      {% for block in section.blocks %}
+        <div id="feature-{{ block.id }}" class="feature-icons-item">
+          {% if block.settings.icon %}
+            <div class="feature-icons-item__icon">
+              <img
+                src="{{ block.settings.icon | img_url: 'master' }}"
+                alt="{{ block.settings.heading | escape }}"
+              />
+            </div>
+          {% endif %}
+          <div class="feature-icons-item__text">
+            <h4>{{ block.settings.heading }}</h4>
+            <p>{{ block.settings.description }}</p>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- Custom Arrows + Counter -->
+    <div class="slider-buttons">
+      <button type="button" class="slider-button slider-button--prev" aria-label="Previous">
+        <span class="svg-wrapper">{{ 'icon-caret.svg' | inline_asset_content }}</span>
+      </button>
+      <div class="slider-counter">
+        <span class="slider-counter--current">1</span>
+        <span aria-hidden="true"> / </span>
+        <span class="slider-counter--total">{{ section.blocks.size }}</span>
+      </div>
+      <button type="button" class="slider-button slider-button--next" aria-label="Next">
+        <span class="svg-wrapper">{{ 'icon-caret.svg' | inline_asset_content }}</span>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- jQuery + Slick JS -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
+
+<script>
+  $(document).ready(function () {
+    var $carousel = $('#feature-carousel-{{ section.id }}');
+
+    $carousel.slick({
+      slidesToShow: 4,
+      slidesToScroll: 1,
+      arrows: false,
+      dots: false,
+      infinite: true,
+      autoplay: true,
+      autoplaySpeed: 3000,
+      pauseOnHover: true,
+      centerPadding: '{{ section.settings.item_gap }}px',
+      responsive: [
+        { breakpoint: 1440, settings: { slidesToShow: 3 } },
+        { breakpoint: 768, settings: { slidesToShow: 2 } },
+        { breakpoint: 480, settings: { slidesToShow: 1 } }
+      ]
+    });
+
+    // Update counter on init & slide change
+    $carousel.on('init afterChange', function (event, slick, currentSlide) {
+      var current = (currentSlide || 0) + 1;
+      $('.feature-icons-section .slider-counter--current').text(current);
+      $('.feature-icons-section .slider-counter--total').text(slick.slideCount);
+    });
+
+    // Custom arrow buttons
+    $('.feature-icons-section .slider-button--prev').on('click', function () {
+      $carousel.slick('slickPrev');
+    });
+
+    $('.feature-icons-section .slider-button--next').on('click', function () {
+      $carousel.slick('slickNext');
+    });
+
+    // Trigger initial render
+    $carousel.slick('setPosition');
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Feature icons",
+  "settings": [
+    { "type": "color", "id": "section_bg_color", "label": "Section background colour", "default": "#f4f4f4" },
+    { "type": "color", "id": "heading_color", "label": "Heading colour", "default": "#162b4f" },
+    { "type": "color", "id": "desc_color", "label": "Description colour", "default": "#666666" },
+    {
+      "type": "select",
+      "id": "heading_font_weight",
+      "label": "Heading font weight",
+      "options": [
+        { "value": "300", "label": "Light (300)" },
+        { "value": "400", "label": "Normal (400)" },
+        { "value": "500", "label": "Medium (500)" },
+        { "value": "600", "label": "Semi-bold (600)" },
+        { "value": "700", "label": "Bold (700)" },
+        { "value": "800", "label": "Extra-bold (800)" }
+      ],
+      "default": "600"
+    },
+    { "type": "range", "id": "icon_size", "label": "Icon size (px)", "min": 24, "max": 101, "step": 1, "unit": "px", "default": 48 },
+    { "type": "range", "id": "heading_font_size", "label": "Heading font size (px)", "min": 14, "max": 36, "step": 1, "unit": "px", "default": 16 },
+    { "type": "range", "id": "desc_font_size", "label": "Description font size (px)", "min": 10, "max": 24, "step": 1, "unit": "px", "default": 14 },
+    { "type": "range", "id": "item_gap", "label": "Gap between items (px)", "min": 0, "max": 60, "step": 1, "unit": "px", "default": 20 }
+  ],
+  "blocks": [
+    {
+      "type": "feature",
+      "name": "Feature",
+      "settings": [
+        { "type": "image_picker", "id": "icon", "label": "Icon" },
+        { "type": "text", "id": "heading", "label": "Heading", "default": "RAPID DELIVERY" },
+        { "type": "textarea", "id": "description", "label": "Description", "default": "Nationwide delivery to Mainland UK" }
+      ]
+    }
+  ],
+  "presets": [
+    { "name": "Feature icons (with bottom arrows)", "category": "Custom" }
+  ]
+}
+{% endschema %}
