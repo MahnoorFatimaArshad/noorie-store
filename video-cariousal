@@ -1,0 +1,140 @@
+{% schema %}
+{
+  "name": "Video Feedback Carousel",
+  "settings": [],
+  "blocks": [
+    {
+      "type": "video",
+      "name": "Video Card",
+      "settings": [
+        {
+          "type": "url",
+          "id": "video_url",
+          "label": "Video URL (MP4 format)"
+        },
+        {
+          "type": "text",
+          "id": "user_name",
+          "label": "User Name",
+          "default": "Customer Name"
+        },
+        {
+          "type": "textarea",
+          "id": "caption",
+          "label": "Caption",
+          "default": "This product changed my life!"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 20,
+  "presets": [
+    {
+      "name": "Video Cards Carousel",
+      "category": "Media"
+    }
+  ]
+}
+{% endschema %}
+
+<style>
+  .video-carousel-section {
+    max-width: 1200px;
+    margin: 60px auto;
+    padding: 0 20px;
+  }
+
+  .video-carousel .video-card {
+    background: #fff;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    height: 100%;
+  }
+
+  .video-carousel .video-card video {
+    width: 100%;
+    border-radius: 12px;
+    margin-bottom: 10px;
+  }
+
+  .video-carousel .user-name {
+    font-weight: bold;
+    margin-bottom: 5px;
+    font-size: 16px;
+    color: #222;
+  }
+
+  .video-carousel .caption {
+    font-size: 14px;
+    color: #555;
+  }
+
+  /* Slick settings */
+  .slick-arrow,
+  .slick-dots {
+    display: none !important;
+  }
+
+  .video-carousel .video-slide {
+    padding: 10px;
+    height: 100%;
+  }
+</style>
+
+<section class="video-carousel-section">
+  <div class="video-carousel">
+    {% for block in section.blocks %}
+      {% if block.settings.video_url != blank %}
+        <div class="video-slide">
+          <div class="video-card">
+            <video controls muted playsinline>
+              <source src="{{ block.settings.video_url }}" type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+            <div class="user-name">{{ block.settings.user_name }}</div>
+            <div class="caption">{{ block.settings.caption }}</div>
+          </div>
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+</section>
+
+<!-- Slick CDN -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick-theme.css" />
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    $('.video-carousel').slick({
+      slidesToShow: 4,
+      slidesToScroll: 1,
+      autoplay: true,
+      autoplaySpeed: 3000,
+      arrows: false,
+      dots: false,
+      responsive: [
+        {
+          breakpoint: 1024,
+          settings: {
+            slidesToShow: 3
+          }
+        },
+        {
+          breakpoint: 768,
+          settings: {
+            slidesToShow: 1
+          }
+        }
+      ]
+    });
+  });
+</script>
